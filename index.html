@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Calculator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: #1e3c72;
+            color: white;
+            flex-direction: column;
+            text-align: center;
+        }
+
+        #particles-js {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .container {
+            width: 80%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            animation: fadeIn 1.5s ease-in-out;
+            margin-bottom: 20px;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            background: #ff9800;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .tab:hover,
+        .tab.active {
+            background: #e68900;
+        }
+
+        .content {
+            display: none;
+        }
+
+        .content.active {
+            display: block;
+        }
+
+        .calculator,
+        .converter,
+        .calorie-counter {
+            margin: 0 auto;
+            width: 350px;
+        }
+
+        input[type="text"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            outline: none;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .button {
+            padding: 15px;
+            font-size: 1.2em;
+            border: none;
+            background: #ff9800;
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.3s;
+            box-shadow: 0 5px 15px rgba(255, 152, 0, 0.4);
+        }
+
+        .button:hover {
+            background: #e68900;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 152, 0, 0.6);
+        }
+
+        .history {
+            max-height: 100px;
+            overflow-y: auto;
+            text-align: left;
+            margin-top: 10px;
+        }
+
+        .history p {
+            margin: 0;
+            padding: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="particles-js"></div>
+    <div class="container">
+        <div class="tabs">
+            <div class="tab active" data-tab="calculator">Calculator</div>
+            <div class="tab" data-tab="converter">Unit Converter</div>
+            <div class="tab" data-tab="calorie-counter">Calorie Counter</div>
+        </div>
+        <div class="content calculator active">
+            <h2>Calculator</h2>
+            <h3>﴿وَمَا تَوۡفِیقِیۤ إِلَّا بِٱللَّهِۚ عَلَیهِ تَوَكَّلتُ وَإِلَیهِ أُنِیبُ﴾</h3>
+            <input type="text" id="expression" placeholder="Enter expression" readonly>
+            <div class="buttons">
+                <button class="button" onclick="appendToExpression('1')">1</button>
+                <button class="button" onclick="appendToExpression('2')">2</button>
+                <button class="button" onclick="appendToExpression('3')">3</button>
+                <button class="button" onclick="appendToExpression('+')">+</button>
+                <button class="button" onclick="appendToExpression('4')">4</button>
+                <button class="button" onclick="appendToExpression('5')">5</button>
+                <button class="button" onclick="appendToExpression('6')">6</button>
+                <button class="button" onclick="appendToExpression('-')">-</button>
+                <button class="button" onclick="appendToExpression('7')">7</button>
+                <button class="button" onclick="appendToExpression('8')">8</button>
+                <button class="button" onclick="appendToExpression('9')">9</button>
+                <button class="button" onclick="appendToExpression('*')">*</button>
+                <button class="button" onclick="appendToExpression('0')">0</button>
+                <button class="button" onclick="appendToExpression('.')">.</button>
+                <button class="button" onclick="appendToExpression('/')">/</button>
+                <button class="button" onclick="appendToExpression('=')">=</button>
+                <button class="button" onclick="appendToExpression('(')">(</button>
+                <button class="button" onclick="appendToExpression(')')">)</button>
+                <button class="button" onclick="clearExpression()">C</button>
+                <button class="button" onclick="backspace()">⌫</button>
+            </div>
+            <div class="history" id="history"></div>
+            <p id="result"></p>
+        </div>
+        <div class="content converter">
+            <h2>Unit Converter</h2>
+            <select id="unitType" onchange="populateUnits()">
+                <option value="length">Length</option>
+                <option value="weight">Weight</option>
+                <!-- Add more unit types here -->
+            </select>
+            <select id="fromUnit"></select>
+            <select id="toUnit"></select>
+            <input type="text" id="unitInput" placeholder="Enter value">
+            <button onclick="convertUnit()">Convert</button>
+            <p id="unitResult"></p>
+        </div>
+        <div class="content calorie-counter">
+            <h2>Calorie Counter</h2>
+            <input type="text" id="weight" placeholder="Enter weight (kg)">
+            <input type="text" id="height" placeholder="Enter height (cm)">
+            <input type="text" id="age" placeholder="Enter age">
+            <select id="activityLevel">
+                <option value="1.2">Sedentary</option>
+                <option value="1.375">Lightly active</option>
+                <option value="1.55">Moderately active</option>
+                <option value="1.725">Very active</option>
+                <option value="1.9">Super active</option>
+            </select>
+            <button onclick="calculateCalories()">Calculate</button>
+            <p id="calorieResult"></p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    <script>
+        particlesJS.load('particles-js', 'https://cdn.jsdelivr.net/gh/VincentGarreau/particles.js/particles.json', function () {
+            console.log('particles.js loaded - callback');
+        });
+
+        const tabs = document.querySelectorAll('.tab');
+        const contents = document.querySelectorAll('.content');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                contents.forEach(content => content.classList.remove('active'));
+                document.querySelector(`.content.${tab.dataset.tab}`).classList.add('active');
+            });
+        });
+
+        function appendToExpression(value) {
+            let expressionField = document.getElementById('expression');
+            if (value === '=') {
+                calculate();
+            } else {
+                expressionField.value += value;
+            }
+        }
+
+        function clearExpression() {
+            document.getElementById('expression').value = '';
+            document.getElementById('result').innerText = '';
+        }
+
+        function backspace() {
+            let expressionField = document.getElementById('expression');
+            expressionField.value = expressionField.value.slice(0, -1);
+        }
+
+        function calculate() {
+            const expressionInput = document.getElementById('expression').value;
+            let expression = expressionInput;
+            let variables = {};
+
+            // Extract variables and their values
+            const variableAssignments = expression.match(/([a-zA-Z]\w*)\s*=\s*([\d.]+)/g);
+            if (variableAssignments) {
+                variableAssignments.forEach(assignment => {
+                    const [varName, value] = assignment.split('=').map(str => str.trim());
+                    variables[varName] = parseFloat(value);
+                });
+                // Remove variable assignments from the expression
+                expression = expression.replace(/([a-zA-Z]\w*)\s*=\s*[\d.]+/g, '');
+            }
+
+            // Replace variables in the expression with their values
+            for (const [varName, value] of Object.entries(variables)) {
+                expression = expression.replace(new RegExp(`\\b${varName}\\b`, 'g'), value);
+            }
+
+            // Evaluate the final expression
+            try {
+                const result = eval(expression);
+                document.getElementById('result').innerText = `${expressionInput} = ${result}`;
+                addToHistory(`${expressionInput} = ${result}`);
+            } catch (error) {
+                document.getElementById('result').innerText = `Error: Invalid expression`;
+            }
+        }
+
+        function addToHistory(entry) {
+            const history = document.getElementById('history');
+            const newEntry = document.createElement('p');
+            newEntry.textContent = entry;
+            history.appendChild(newEntry);
+        }
+
+        function populateUnits() {
+            const unitType = document.getElementById('unitType').value;
+            const fromUnit = document.getElementById('fromUnit');
+            const toUnit = document.getElementById('toUnit');
+            let units = [];
+
+            if (unitType === 'length') {
+                units = ['meters', 'kilometers', 'feet', 'miles'];
+            } else if (unitType === 'weight') {
+                units = ['grams', 'kilograms', 'pounds', 'ounces'];
+            }
+
+            fromUnit.innerHTML = units.map(unit => `<option value="${unit}">${unit}</option>`).join('');
+            toUnit.innerHTML = units.map(unit => `<option value="${unit}">${unit}</option>`).join('');
+        }
+
+        function convertUnit() {
+            const unitType = document.getElementById('unitType').value;
+            const fromUnit = document.getElementById('fromUnit').value;
+            const toUnit = document.getElementById('toUnit').value;
+            const unitInput = parseFloat(document.getElementById('unitInput').value);
+            let conversionFactor = 1;
+
+            if (unitType === 'length') {
+                if (fromUnit === 'meters' && toUnit === 'kilometers') conversionFactor = 0.001;
+                if (fromUnit === 'kilometers' && toUnit === 'meters') conversionFactor = 1000;
+                if (fromUnit === 'feet' && toUnit === 'meters') conversionFactor = 0.3048;
+                if (fromUnit === 'meters' && toUnit === 'feet') conversionFactor = 3.28084;
+                if (fromUnit === 'miles' && toUnit === 'kilometers') conversionFactor = 1.60934;
+                if (fromUnit === 'kilometers' && toUnit === 'miles') conversionFactor = 0.621371;
+            } else if (unitType === 'weight') {
+                if (fromUnit === 'grams' && toUnit === 'kilograms') conversionFactor = 0.001;
+                if (fromUnit === 'kilograms' && toUnit === 'grams') conversionFactor = 1000;
+                if (fromUnit === 'pounds' && toUnit === 'kilograms') conversionFactor = 0.453592;
+                if (fromUnit === 'kilograms' && toUnit === 'pounds') conversionFactor = 2.20462;
+                if (fromUnit === 'ounces' && toUnit === 'grams') conversionFactor = 28.3495;
+                if (fromUnit === 'grams' && toUnit === 'ounces') conversionFactor = 0.035274;
+            }
+
+            const result = unitInput * conversionFactor;
+            document.getElementById('unitResult').innerText = `${unitInput} ${fromUnit} = ${result} ${toUnit}`;
+        }
+
+        function calculateCalories() {
+            const weight = parseFloat(document.getElementById('weight').value);
+            const height = parseFloat(document.getElementById('height').value);
+            const age = parseFloat(document.getElementById('age').value);
+            const activityLevel = parseFloat(document.getElementById('activityLevel').value);
+
+            if (isNaN(weight) || isNaN(height) || isNaN(age)) {
+                document.getElementById('calorieResult').innerText = 'Please enter valid values for weight, height, and age.';
+                return;
+            }
+
+            // BMR calculation using Mifflin-St Jeor Equation
+            const bmr = 10 * weight + 6.25 * height - 5 * age + 5; // for men
+            // const bmr = 10 * weight + 6.25 * height - 5 * age - 161; // for women
+
+            const calories = bmr * activityLevel;
+            document.getElementById('calorieResult').innerText = `Daily Caloric Need: ${calories.toFixed(2)} calories`;
+        }
+
+        window.onload = populateUnits;
+    </script>
+</body>
+
+</html>
